@@ -68,3 +68,9 @@ export const addComment = (videoId, commentData) => axiosInstance.post(`/videos/
 export const getComments = (videoId) => axiosInstance.get(`/videos/${videoId}/comments`);
 export const toggleCommentLike = (commentId) => axiosInstance.post(`/comments/${commentId}/like`);
 export const getCommentReplies = (commentId) => axiosInstance.get(`/comments/${commentId}/replies`);
+
+// --- Notification APIs ---
+export const getNotifications = () => axiosInstance.get('/notifications');
+export const markNotificationAsRead = (id) => axiosInstance.put(`/notifications/${id}/read`);
+export const markAllNotificationsAsRead = () => axiosInstance.put('/notifications/read');
+export const deleteNotification = (id) => axiosInstance.delete(`/notifications/${id}`);

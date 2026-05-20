@@ -47,6 +47,7 @@ const MainLayout = () => {
   const [showAuthWall, setShowAuthWall] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const isWatchPage = location.pathname.startsWith('/watch');
 
@@ -163,12 +164,20 @@ const MainLayout = () => {
             <div className="relative">
               <button
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
-                className="p-2 hover:bg-white/5 rounded-full relative"
+                className="p-2 hover:bg-white/5 rounded-full relative transition-all duration-300"
               >
                 <Bell size={20} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-dark" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 px-1.5 py-0.5 min-w-[18px] h-[18px] bg-accent text-[10px] font-bold text-white rounded-full border border-dark flex items-center justify-center shadow-[0_0_8px_rgba(244,63,94,0.5)] animate-pulse">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
-              <NotificationCenter isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+              <NotificationCenter 
+                isOpen={isNotifOpen} 
+                onClose={() => setIsNotifOpen(false)} 
+                onUnreadChange={setUnreadCount} 
+              />
             </div>
             <button className="btn-primary py-1.5 px-4 text-sm hidden sm:block">
               Go Live
