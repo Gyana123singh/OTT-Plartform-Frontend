@@ -10,7 +10,7 @@ const Collection = () => {
   const collectionName = id.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   return (
-    <div className="space-y-8 md:space-y-12 pb-20 px-2 md:px-0">
+    <div className="space-y-8 md:space-y-12 pb-20 px-0">
       {/* Premium Hero Banner */}
       <section className="relative h-[350px] md:h-[450px] rounded-3xl md:rounded-[3rem] overflow-hidden group">
          <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/40 to-transparent z-10" />

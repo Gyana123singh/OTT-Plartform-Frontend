@@ -94,7 +94,7 @@ const MediaChat = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] lg:h-[calc(100vh-120px)] gap-4 lg:gap-6 p-2 lg:p-0">
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] lg:h-[calc(100vh-120px)] gap-4 lg:gap-6 px-0 py-4 lg:p-0">
       {/* Chats List Sidebar */}
       <div className="w-full lg:w-80 h-[35%] lg:h-auto flex flex-col glass-card overflow-hidden shrink-0">
         <div className="p-3 md:p-4 border-b border-white/10 space-y-3 md:space-y-4 shrink-0">

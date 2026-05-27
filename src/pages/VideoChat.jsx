@@ -76,7 +76,7 @@ const VideoChat = () => {
     }
   };
   return (
-    <div className="flex flex-col h-auto lg:h-[calc(100vh-120px)] gap-4 md:gap-6 p-2 lg:p-0 relative">
+    <div className="flex flex-col h-auto lg:h-[calc(100vh-120px)] gap-4 md:gap-6 px-0 py-4 lg:p-0 relative">
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 shrink-0">
         <div className="min-w-0">

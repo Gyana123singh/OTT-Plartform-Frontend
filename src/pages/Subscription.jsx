@@ -148,7 +148,7 @@ const Subscription = () => {
 
   return (
     <div className="py-10 space-y-12">
-      <div className="text-center space-y-4 max-w-2xl mx-auto px-4">
+      <div className="text-center space-y-4 max-w-2xl mx-auto px-0">
         <h1 className="text-4xl font-black text-white tracking-tight">Choose Your Experience</h1>
         <p className="text-slate-400">Unlock the full power of G Plus with our premium features and high-fidelity streaming.</p>
       </div>
@@ -164,7 +164,7 @@ const Subscription = () => {
            <p className="text-slate-500 font-bold">No active plans available at the moment. <br/> Please check back later or contact support.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-0">
           {plans.map((plan) => {
             const isCurrentPlan = plan.name === currentPlanName;
             const isPremium = plan.isPopular;
@@ -232,7 +232,7 @@ const Subscription = () => {
       )}
 
       {/* Trust Badges */}
-      <div className="flex flex-wrap justify-center gap-12 pt-10 px-4">
+      <div className="flex flex-wrap justify-center gap-12 pt-10 px-0">
         {[
           { icon: ShieldCheck, label: 'SECURE PAYMENTS' },
           { icon: Star, label: 'TRUSTED BY 1M+' },

@@ -1097,7 +1097,7 @@ const LiveStream = () => {
     const spotlightStream = activeStreams[0];
 
     return (
-      <div className="max-w-7xl mx-auto py-6 md:py-10 px-4 space-y-8 md:space-y-12">
+      <div className="max-w-7xl mx-auto py-6 md:py-10 px-0 space-y-8 md:space-y-12">
         {/* Page Hero Spotlight Header */}
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-900/40 via-purple-950/20 to-dark border border-white/5 shadow-2xl p-6 md:p-12 flex flex-col md:flex-row gap-8 items-center">
           {/* Neon Orb background */}
@@ -1362,7 +1362,7 @@ const LiveStream = () => {
   // Render 2: YouTube-like Stream Setup Control Room
   if (!id && showSetupRoom) {
     return (
-      <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 space-y-6 md:space-y-8">
+      <div className="max-w-6xl mx-auto py-6 md:py-10 px-0 space-y-6 md:space-y-8">
          {/* YouTube-like Header */}
          <div className="flex items-center justify-between border-b border-white/5 pb-6 gap-4">
            <div className="flex items-center gap-4">
@@ -1517,7 +1517,7 @@ const LiveStream = () => {
 
   // Render 3: Standard Stream Player and Live Chat Room Layout (when ID exists)
   return (
-    <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-120px)] gap-4 lg:gap-6 p-2 sm:p-4 lg:p-0">
+    <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-120px)] gap-4 lg:gap-6 px-0 py-2 sm:px-0 sm:py-4 lg:p-0">
       {/* Synthesized Inline Stylesheet for animations */}
       <style>{`
         @keyframes floatBubble {

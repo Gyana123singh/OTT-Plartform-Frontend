@@ -94,7 +94,7 @@ const Home = () => {
   }, [activeCategory, streams]);
 
   return (
-    <div className="space-y-8 md:space-y-10 pb-20 px-4 md:px-0">
+    <div className="space-y-8 md:space-y-10 pb-20 px-0">
       {/* Hero Section */}
       <section className="relative h-[350px] md:h-[400px] rounded-3xl md:rounded-[2rem] overflow-hidden group cursor-pointer" onClick={() => navigate('/watch/hero')}>
         <div className="absolute inset-0 bg-gradient-to-r from-dark/80 md:from-dark via-dark/60 md:via-dark/50 to-transparent z-10" />

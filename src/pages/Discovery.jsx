@@ -85,7 +85,7 @@ const Discovery = () => {
   const filteredContent = content; // Logic handled in fetchContent
 
   return (
-    <div className="space-y-6 md:space-y-10 pb-20 px-4 md:px-0">
+    <div className="space-y-6 md:space-y-10 pb-20 px-0">
       {/* Header & Search */}
       <div className="flex flex-col gap-4 md:gap-6">
         <div className="max-w-2xl">
