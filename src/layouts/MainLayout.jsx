@@ -16,12 +16,13 @@ import {
   ShieldCheck,
   LayoutDashboard,
   Compass,
-  Calendar
+  Calendar,
+  Users
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'framer-motion';
-import AnimatedLogo from '../components/AnimatedLogo';
+
 import NotificationCenter from '../components/NotificationCenter';
 import AuthWall from '../components/auth/AuthWall';
 
@@ -35,6 +36,7 @@ const NavItems = [
   { icon: Tv, label: 'Live Stream', path: '/live' },
   { icon: Video, label: 'Video Chat', path: '/video-chat' },
   { icon: MessageSquare, label: 'Media Chat', path: '/media-chat' },
+  { icon: Users, label: 'Communities', path: '/communities' },
   { icon: Newspaper, label: 'News', path: '/news' },
   { icon: Calendar, label: 'Events', path: '/events' },
   { icon: CreditCard, label: 'Subscription', path: '/subscription' },
@@ -191,12 +193,11 @@ const MainLayout = () => {
           <Outlet />
         </div>
 
-        {/* G Plus Animated Logo */}
-        <AnimatedLogo position="bottom-right" className="hidden md:block" />
+
 
         {/* Bottom Nav - Mobile Only */}
         <nav className="md:hidden flex items-center justify-around h-16 bg-dark-lighter/80 backdrop-blur-xl border-t border-white/5 px-4 sticky bottom-0 z-30">
-          {NavItems.slice(0, 5).map((item) => (
+          {NavItems.slice(0, 6).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

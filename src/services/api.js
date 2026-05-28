@@ -74,3 +74,25 @@ export const getNotifications = () => axiosInstance.get('/notifications');
 export const markNotificationAsRead = (id) => axiosInstance.put(`/notifications/${id}/read`);
 export const markAllNotificationsAsRead = () => axiosInstance.put('/notifications/read');
 export const deleteNotification = (id) => axiosInstance.delete(`/notifications/${id}`);
+
+// --- Community APIs ---
+export const createCommunity = (data) => axiosInstance.post('/communities/create', data);
+export const uploadCommunityImage = (formData) => axiosInstance.post('/communities/upload', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+export const getMyCommunities = () => axiosInstance.get('/communities/my');
+export const getCommunityById = (id) => axiosInstance.get(`/communities/${id}`);
+export const updateCommunity = (id, data) => axiosInstance.post(`/communities/${id}/update`, data);
+export const deleteCommunity = (id) => axiosInstance.delete(`/communities/${id}`);
+export const joinCommunity = (id) => axiosInstance.post(`/communities/${id}/join`);
+export const leaveCommunity = (id) => axiosInstance.post(`/communities/${id}/leave`);
+export const inviteToCommunity = (id, data) => axiosInstance.post(`/communities/${id}/invite`, data);
+export const removeCommunityMember = (id, data) => axiosInstance.post(`/communities/${id}/remove-member`, data);
+export const promoteCommunityAdmin = (id, data) => axiosInstance.post(`/communities/${id}/promote-admin`, data);
+
+// --- Community Groups APIs ---
+export const createCommunityGroup = (id, data) => axiosInstance.post(`/communities/${id}/groups/create`, data);
+export const getCommunityGroups = (id) => axiosInstance.get(`/communities/${id}/groups`);
+export const joinCommunityGroup = (id) => axiosInstance.post(`/communities/groups/${id}/join`);
+export const leaveCommunityGroup = (id) => axiosInstance.post(`/communities/groups/${id}/leave`);
+export const getCommunityGroupMessages = (id) => axiosInstance.get(`/communities/groups/${id}/messages`);

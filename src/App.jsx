@@ -6,6 +6,8 @@ import Home from './pages/Home';
 import LiveStream from './pages/LiveStream';
 import VideoChat from './pages/VideoChat';
 import MediaChat from './pages/MediaChat';
+import Communities from './pages/Communities';
+import CommunityDetail from './pages/CommunityDetail';
 import News from './pages/News';
 import Subscription from './pages/Subscription';
 import Profile from './pages/Profile';
@@ -49,6 +51,8 @@ function App() {
             <Route path="live/:id" element={<LiveStream />} />
             <Route path="video-chat" element={<VideoChat />} />
             <Route path="media-chat" element={<MediaChat />} />
+            <Route path="communities" element={<Communities />} />
+            <Route path="communities/:id" element={<CommunityDetail />} />
             <Route path="news" element={<News />} />
             <Route path="events" element={<Events />} />
             <Route path="watch/:id" element={<Watch />} />
