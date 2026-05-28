@@ -93,10 +93,19 @@ const Home = () => {
     return streams.filter(stream => stream.category === activeCategory);
   }, [activeCategory, streams]);
 
+  const handleHeroClick = () => {
+    const featuredStream = streams[0];
+    if (featuredStream) {
+      navigate(`/live/${featuredStream._id || featuredStream.id}`, { state: { video: featuredStream } });
+    } else {
+      navigate('/live');
+    }
+  };
+
   return (
     <div className="space-y-8 md:space-y-10 pb-20 px-0">
       {/* Hero Section */}
-      <section className="relative h-[350px] md:h-[400px] rounded-3xl md:rounded-[2rem] overflow-hidden group cursor-pointer" onClick={() => navigate('/watch/hero')}>
+      <section className="relative h-[350px] md:h-[400px] rounded-3xl md:rounded-[2rem] overflow-hidden group cursor-pointer" onClick={handleHeroClick}>
         <div className="absolute inset-0 bg-gradient-to-r from-dark/80 md:from-dark via-dark/60 md:via-dark/50 to-transparent z-10" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center group-hover:scale-105 transition-transform duration-700" />
 

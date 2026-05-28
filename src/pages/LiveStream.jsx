@@ -243,24 +243,22 @@ const LiveStream = () => {
 
   // Fetch Live Catalog
   useEffect(() => {
-    if (!id) {
-      const fetchCatalog = async () => {
-        try {
-          setLoadingCatalog(true);
-          const { data } = await getLiveStreams();
-          setActiveStreams(data || []);
-        } catch (err) {
-          console.error("Error fetching live streams catalog:", err);
-        } finally {
-          setLoadingCatalog(false);
-        }
-      };
-      fetchCatalog();
-      
-      // Keep feed dynamic and updated
-      const interval = setInterval(fetchCatalog, 8000);
-      return () => clearInterval(interval);
-    }
+    const fetchCatalog = async () => {
+      try {
+        if (!id) setLoadingCatalog(true);
+        const { data } = await getLiveStreams();
+        setActiveStreams(data || []);
+      } catch (err) {
+        console.error("Error fetching live streams catalog:", err);
+      } finally {
+        if (!id) setLoadingCatalog(false);
+      }
+    };
+    fetchCatalog();
+    
+    // Keep feed dynamic and updated
+    const interval = setInterval(fetchCatalog, 8000);
+    return () => clearInterval(interval);
   }, [id]);
 
   // Handle local camera preview inside Stream setup control room
@@ -1515,6 +1513,8 @@ const LiveStream = () => {
     );
   }
 
+  const otherStreams = activeStreams.filter(s => s._id !== id && s.id !== id);
+
   // Render 3: Standard Stream Player and Live Chat Room Layout (when ID exists)
   return (
     <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-120px)] gap-4 lg:gap-6 px-0 py-2 sm:px-0 sm:py-4 lg:p-0">
@@ -1739,6 +1739,107 @@ const LiveStream = () => {
               <button className="btn-primary py-1.5 px-4 md:py-2 md:px-6 rounded-lg md:rounded-xl text-xs md:text-sm shrink-0">FOLLOW</button>
             )}
           </div>
+        </div>
+
+        {/* Live Video Slider */}
+        <div className="mt-6 md:mt-8 space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-sm md:text-base font-black text-white flex items-center gap-2 uppercase tracking-wider">
+              <Radio size={16} className="text-primary animate-pulse" />
+              More Live Channels
+            </h3>
+            <span className="text-[10px] font-black text-slate-500 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              {otherStreams.length} Online
+            </span>
+          </div>
+
+          {otherStreams.length === 0 ? (
+            <div className="glass-card p-6 text-center border border-white/5 rounded-2xl md:rounded-3xl">
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                No other live streams online right now
+              </p>
+            </div>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-4 pt-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
+              {otherStreams.map((stream) => {
+                const streamId = stream._id || stream.id;
+                const creatorName = stream.creator?.name || stream.creator || "G Plus Streamer";
+                const creatorAvatar = stream.creator?.avatar;
+                const thumbnail = stream.thumbnail || "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=640";
+
+                return (
+                  <div
+                    key={streamId}
+                    onClick={() => navigate(`/live/${streamId}`, { state: { video: stream } })}
+                    className="w-[200px] sm:w-[240px] shrink-0 glass-card rounded-2xl overflow-hidden group cursor-pointer border border-white/5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 flex flex-col"
+                  >
+                    {/* Thumbnail */}
+                    <div className="aspect-video relative overflow-hidden bg-black/40 shrink-0">
+                      <img 
+                        src={thumbnail.startsWith('http') ? thumbnail : `${SOCKET_URL}/${thumbnail.replace(/\\/g, '/')}`} 
+                        alt={stream.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.src = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=640";
+                        }}
+                      />
+                      
+                      {/* Live Badge & Viewers */}
+                      <div className="absolute top-2 left-2 flex items-center gap-1">
+                        <span className="bg-red-600 px-1.5 py-0.5 rounded text-[8px] font-black text-white flex items-center gap-1 shadow-lg shadow-red-600/30">
+                          <span className="w-1 h-1 bg-white rounded-full animate-ping" /> LIVE
+                        </span>
+                        <span className="bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-black text-white flex items-center gap-1">
+                          <Users size={8} className="text-primary" /> {stream.viewerCount || 1}
+                        </span>
+                      </div>
+
+                      {/* Play Button Overlay */}
+                      <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 backdrop-blur-md border border-primary/40 flex items-center justify-center text-white scale-90 group-hover:scale-100 transition-transform duration-300">
+                          <Play size={14} fill="white" className="ml-0.5" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata */}
+                    <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1 text-left">
+                        <span className="text-[8px] font-black uppercase tracking-widest text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                          {stream.category || "Gaming"}
+                        </span>
+                        <h4 className="font-bold text-xs text-white group-hover:text-primary transition-colors line-clamp-1 leading-snug">
+                          {stream.title}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-white/5 mt-2">
+                        {/* Avatar */}
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-primary to-accent p-0.5 shrink-0">
+                          <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
+                            {creatorAvatar ? (
+                              <img src={`${SOCKET_URL}/${creatorAvatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-[8px]">
+                                {creatorName.charAt(0)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Name */}
+                        <div className="min-w-0 flex-1 text-left">
+                          <p className="font-bold text-[10px] text-slate-300 truncate">
+                            {creatorName}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
