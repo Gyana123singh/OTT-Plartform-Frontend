@@ -25,7 +25,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPendingContent, approveContent, rejectContent } from '../../services/api';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const ContentApproval = () => {
   const [loading, setLoading] = useState(true);

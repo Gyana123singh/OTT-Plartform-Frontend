@@ -17,10 +17,10 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { getLiveStreams, endStream } from '../../services/api';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const StreamMonitor = () => {
   const [streams, setStreams] = useState([]);

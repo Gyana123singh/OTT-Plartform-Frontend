@@ -11,7 +11,7 @@ import {
   Smile,
   Paperclip
 } from 'lucide-react';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { getChatMessages } from '../services/api';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -20,7 +20,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const MediaChat = () => {
   const [selectedChat, setSelectedChat] = useState({ id: 'global', name: 'Global Group', avatar: 'bg-primary/20' });

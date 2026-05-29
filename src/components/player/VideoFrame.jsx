@@ -39,7 +39,7 @@ import {
    Check
 } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const AvatarImage = ({ src, name, socketUrl }) => {
    const [imgStatus, setImgStatus] = useState('loading'); // loading, success, error

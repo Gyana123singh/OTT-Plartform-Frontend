@@ -11,7 +11,7 @@ import CommunityDetail from './pages/CommunityDetail';
 import News from './pages/News';
 import Subscription from './pages/Subscription';
 import Profile from './pages/Profile';
-import Auth from './pages/Auth';
+
 import Events from './pages/Events';
 import Discovery from './pages/Discovery';
 import AdminLayout from './admin/AdminLayout';
@@ -41,9 +41,8 @@ function App() {
     <GoogleOAuthProvider clientId={googleClientId}>
       <Router>
         <Routes>
-          {/* Auth Routes */}
-          <Route path="/auth/*" element={<Auth />} />
-          
+
+
           {/* Protected App Routes */}
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />

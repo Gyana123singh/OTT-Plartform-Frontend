@@ -23,7 +23,7 @@ import {
   LogOut,
   Trash2
 } from 'lucide-react';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { 
   getCommunityById, 
   joinCommunity, 
@@ -44,7 +44,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const getAvatarUrl = (src) => {
   if (!src) return '';
@@ -68,6 +68,7 @@ const CommunityDetail = () => {
   const [message, setMessage] = useState("");
   const [typingUser, setTypingUser] = useState(null);
   const [chatLoading, setChatLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef();
   const chatEndRef = useRef();
 
@@ -124,11 +125,11 @@ const CommunityDetail = () => {
         const { data } = await getCommunityGroupMessages(selectedGroup._id);
         setChatMessages(data.map(msg => ({
           id: msg._id,
-          userId: msg.sender._id,
-          user: msg.sender.name,
-          avatar: msg.sender.avatar,
+          userId: msg.sender?._id || '',
+          user: msg.sender?.name || 'Guest',
+          avatar: msg.sender?.avatar || '',
           message: msg.text,
-          isSelf: msg.sender._id === currentUser?._id,
+          isSelf: msg.sender?._id === (currentUser?._id || currentUser?.id),
           timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         })));
       } catch (err) {
@@ -142,31 +143,63 @@ const CommunityDetail = () => {
     fetchMessages();
 
     // Socket Join connection
-    socketRef.current = io(SOCKET_URL);
+    console.log("🔌 CLIENT: Connecting socket to SOCKET_URL:", SOCKET_URL);
+    const token = localStorage.getItem('token');
+    socketRef.current = io(SOCKET_URL, {
+      auth: { token }
+    });
     
-    // Join room
-    socketRef.current.emit('group:join', { groupId: selectedGroup._id });
+    const joinRoom = () => {
+      console.log("🔌 CLIENT: Emitting group:join for groupId:", selectedGroup._id);
+      socketRef.current.emit('group:join', { groupId: selectedGroup._id });
+      setIsConnected(true);
+    };
+
+    socketRef.current.on('connect', () => {
+      console.log('📡 CLIENT: Socket connected successfully. Socket ID:', socketRef.current.id);
+      joinRoom();
+    });
+
+    socketRef.current.on('disconnect', () => {
+      console.log('🔌 CLIENT: Socket disconnected.');
+      setIsConnected(false);
+    });
+
+    socketRef.current.on('connect_error', (error) => {
+      console.error('❌ CLIENT: Socket connection error:', error);
+      setIsConnected(false);
+    });
+
+    // Handle case where socket is already connected when listener is registered
+    if (socketRef.current.connected) {
+      console.log('📡 CLIENT: Socket was already connected. Joining room immediately.');
+      joinRoom();
+    }
 
     // Message listener
     socketRef.current.on('receive_message', (data) => {
-      // Direct room message verification
-      if (data.room === `group:${selectedGroup._id}`) {
-        setChatMessages(prev => [...prev, {
-          id: data.id,
-          userId: data.sender?._id || data.user?._id,
-          user: data.sender?.name || data.user?.name || 'Guest',
-          avatar: data.sender?.avatar || data.user?.avatar,
-          message: data.message || data.text,
-          isSelf: (data.sender?._id || data.user?._id) === currentUser?._id,
-          timestamp: new Date(data.timestamp || data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }]);
-        setTimeout(scrollToBottom, 50);
-      }
+      console.log("✉️ CLIENT: Received receive_message socket event. Data:", data);
+      
+      const senderId = data.sender?._id || data.user?._id;
+      const myId = currentUser?._id || currentUser?.id;
+      
+      setChatMessages(prev => [...prev, {
+        id: data.id,
+        userId: senderId,
+        user: data.sender?.name || data.user?.name || 'Guest',
+        avatar: data.sender?.avatar || data.user?.avatar,
+        message: data.message || data.text,
+        isSelf: senderId === myId,
+        timestamp: new Date(data.timestamp || data.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+      setTimeout(scrollToBottom, 50);
     });
 
     // Typing listener
     socketRef.current.on('group:user_typing', ({ user, isTyping }) => {
-      if (isTyping && user._id !== currentUser?._id) {
+      const typingId = user?._id || user?.id;
+      const myId = currentUser?._id || currentUser?.id;
+      if (isTyping && typingId !== myId) {
         setTypingUser(user.name);
       } else {
         setTypingUser(null);
@@ -175,10 +208,12 @@ const CommunityDetail = () => {
 
     return () => {
       if (socketRef.current) {
+        console.log("🔌 CLIENT: Leaving room group:", selectedGroup._id);
         socketRef.current.emit('group:leave', { groupId: selectedGroup._id });
         socketRef.current.disconnect();
       }
       setTypingUser(null);
+      setIsConnected(false);
     };
   }, [selectedGroup]);
 
@@ -187,16 +222,27 @@ const CommunityDetail = () => {
     e.preventDefault();
     if (!message.trim() || !socketRef.current || !selectedGroup) return;
 
+    const resolvedUser = {
+      ...currentUser,
+      _id: currentUser?._id || currentUser?.id
+    };
+
+    console.log("✉️ CLIENT: Emitting group:message. Payload:", {
+      groupId: selectedGroup._id,
+      message: message.trim(),
+      user: resolvedUser
+    });
+
     socketRef.current.emit('group:message', {
       groupId: selectedGroup._id,
       message: message.trim(),
-      user: currentUser
+      user: resolvedUser
     });
 
     // Emit typing off
     socketRef.current.emit('group:typing', {
       groupId: selectedGroup._id,
-      user: currentUser,
+      user: resolvedUser,
       isTyping: false
     });
 
@@ -670,8 +716,8 @@ const CommunityDetail = () => {
                 
                 <div className="min-w-0">
                   <h3 className="font-bold text-xs sm:text-sm truncate text-white">{selectedGroup.name}</h3>
-                  <p className="text-[9px] text-green-500 font-bold uppercase tracking-widest truncate mt-0.5">
-                    {typingUser ? `💬 ${typingUser} is typing...` : 'REALTIME SYNCED'}
+                  <p className={cn("text-[9px] font-bold uppercase tracking-widest truncate mt-0.5", isConnected ? "text-green-500" : "text-amber-500")}>
+                    {typingUser ? `💬 ${typingUser} is typing...` : (isConnected ? '● REALTIME SYNCED' : '○ CONNECTING...')}
                   </p>
                 </div>
               </div>

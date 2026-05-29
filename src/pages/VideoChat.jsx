@@ -11,7 +11,7 @@ import {
   Maximize2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -20,7 +20,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const VideoChat = () => {
   const navigate = useNavigate();

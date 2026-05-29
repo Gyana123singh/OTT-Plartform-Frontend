@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Play, TrendingUp, Star, Clock, Eye, User, ChevronRight, Calendar, Users, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { getLiveStreams, getVideos } from '../services/api';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -11,7 +11,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const AvatarImage = ({ src, name, socketUrl }) => {
   const [imgStatus, setImgStatus] = useState('loading'); // loading, success, error

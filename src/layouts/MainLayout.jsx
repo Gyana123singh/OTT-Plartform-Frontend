@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home as HomeIcon,
   Tv,
@@ -51,6 +51,7 @@ const MainLayout = () => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const isWatchPage = location.pathname.startsWith('/watch');
 
   React.useEffect(() => {
@@ -181,7 +182,10 @@ const MainLayout = () => {
                 onUnreadChange={setUnreadCount} 
               />
             </div>
-            <button className="btn-primary py-1.5 px-4 text-sm hidden sm:block">
+            <button 
+              onClick={() => navigate('/creator', { state: { openStreamModal: true } })}
+              className="btn-primary py-1.5 px-4 text-sm hidden sm:block"
+            >
               Go Live
             </button>
             <div className="w-8 h-8 rounded-full bg-slate-700 md:hidden" />

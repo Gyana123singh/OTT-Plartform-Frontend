@@ -17,15 +17,16 @@ import {
   Loader2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import StreamConfigModal from '../components/StreamConfigModal';
 import UploadMediaModal from '../components/UploadMediaModal';
 import { getCreatorVideos, becomeCreator } from '../../services/api';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
 const CreatorDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isStreamModalOpen, setIsStreamModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [videos, setVideos] = useState([]);
@@ -61,7 +62,13 @@ const CreatorDashboard = () => {
 
     fetchMyVideos();
   }, []);
-
+  useEffect(() => {
+    if (location.state?.openStreamModal) {
+      setIsStreamModalOpen(true);
+      // Clear location state to prevent modal reopening on page refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
   const stats = [
     { label: "Total Views", value: videos.reduce((acc, v) => acc + v.views, 0).toLocaleString(), icon: Eye, color: "text-blue-500", trend: "+12.5%" },
     { label: "Subscribers", value: "24.8K", icon: Users, color: "text-primary", trend: "+4.2%" },

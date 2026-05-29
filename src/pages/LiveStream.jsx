@@ -1062,19 +1062,19 @@ const LiveStream = () => {
 
   const handleCreateBroadcastClick = async () => {
     if (!currentUser?._id) {
-      navigate('/auth');
+      navigate('/');
       return;
     }
 
     if (currentUser.role === 'creator') {
-      setShowSetupRoom(true);
+      navigate('/creator', { state: { openStreamModal: true } });
     } else {
       if (window.confirm("Would you like to unlock G Plus Creator Studio and start your own live streams?")) {
         try {
           await becomeCreator();
           const updatedUser = { ...currentUser, role: 'creator' };
           localStorage.setItem('user', JSON.stringify(updatedUser));
-          window.location.reload();
+          navigate('/creator', { state: { openStreamModal: true } });
         } catch (err) {
           console.error("Error unlocking creator role:", err);
           alert("Failed to activate Creator Account. Please try again.");
