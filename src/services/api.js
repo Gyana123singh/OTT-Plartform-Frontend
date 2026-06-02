@@ -5,13 +5,21 @@ export const register = (userData) => axiosInstance.post('/auth/register', userD
 export const login = (credentials) => axiosInstance.post('/auth/login', credentials);
 export const googleLogin = (credential) => axiosInstance.post('/auth/google', { credential });
 export const getProfile = () => axiosInstance.get('/auth/profile');
+export const updateProfile = (formData) => axiosInstance.put('/auth/profile', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+export const changePassword = (data) => axiosInstance.put('/auth/change-password', data);
+export const clearWatchHistory = () => axiosInstance.delete('/auth/watch-history');
+export const updateWatchTime = (watchTimeDelta) => axiosInstance.post('/auth/watch-time', { watchTimeDelta });
 export const becomeCreator = () => axiosInstance.put('/auth/become-creator');
+export const getCreatorProfileById = (id) => axiosInstance.get(`/auth/creator/${id}`);
 export const adminLogin = (credentials) => axiosInstance.post('/admin/login', credentials);
 
 // --- Video APIs ---
 export const getVideos = (params) => axiosInstance.get('/videos', { params });
 export const getCreatorVideos = () => axiosInstance.get('/videos/my/all');
 export const getVideoById = (id) => axiosInstance.get(`/videos/${id}`);
+export const updateVideoDuration = (id, duration) => axiosInstance.put(`/videos/${id}/duration`, { duration });
 export const uploadVideo = (formData, onProgress) => axiosInstance.post('/videos/upload', formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
   onUploadProgress: (progressEvent) => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import VideoPlayer from './VideoPlayer';
 import { cn } from '../../utils/cn';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
    getVideos,
    toggleLike,
@@ -10,7 +11,9 @@ import {
    addComment,
    getComments,
    toggleCommentLike,
-   getCommentReplies
+   getCommentReplies,
+   updateVideoDuration,
+   updateWatchTime
 } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -87,6 +90,7 @@ const VideoFrame = ({ video: initialVideo }) => {
    const [commentsLoading, setCommentsLoading] = useState(true);
    const [isSubscribed, setIsSubscribed] = useState(false);
    const [subCount, setSubCount] = useState(0);
+   const [toastMessage, setToastMessage] = useState(null);
    const navigate = useNavigate();
    const user = JSON.parse(localStorage.getItem('user')) || {};
 
@@ -97,8 +101,13 @@ const VideoFrame = ({ video: initialVideo }) => {
       const currentUser = JSON.parse(localStorage.getItem('user')) || {};
 
       if (creatorId) {
-         setIsSubscribed(currentUser.following?.includes(creatorId) || false);
          const subs = initialVideo.creator?.subscribers || [];
+         const isSub = (currentUser.following?.includes(creatorId)) || (
+            Array.isArray(subs) && currentUser._id 
+               ? subs.some(sub => (sub._id?.toString() || sub.toString()) === currentUser._id.toString()) 
+               : false
+         );
+         setIsSubscribed(isSub);
          setSubCount(Array.isArray(subs) ? subs.length : (typeof subs === 'number' ? subs : 0));
       }
    }, [initialVideo]);
@@ -117,7 +126,11 @@ const VideoFrame = ({ video: initialVideo }) => {
 
       const handleView = async () => {
          try {
-            await incrementViews(video._id);
+            const { data } = await incrementViews(video._id);
+            setVideo(prev => ({
+               ...prev,
+               views: data.views
+            }));
          } catch (err) {
             console.error("Error incrementing views:", err);
          }
@@ -138,6 +151,37 @@ const VideoFrame = ({ video: initialVideo }) => {
       handleView();
       fetchComments();
    }, [video._id]);
+
+   const handleDurationLoaded = async (durationSeconds) => {
+      if (!durationSeconds || isNaN(durationSeconds)) return;
+      
+      const mins = Math.floor(durationSeconds / 60);
+      const secs = Math.floor(durationSeconds % 60);
+      const formattedDuration = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      
+      if (video && video.duration !== formattedDuration) {
+         console.log(`📡 Auto-syncing video duration. DB value: ${video.duration}, Real value: ${formattedDuration}`);
+         try {
+            await updateVideoDuration(video._id, formattedDuration);
+            setVideo(prev => ({
+               ...prev,
+               duration: formattedDuration
+            }));
+         } catch (err) {
+            console.error("Failed to sync video duration in DB:", err);
+         }
+      }
+   };
+
+   const handleTimePing = async (seconds) => {
+      if (!localStorage.getItem('token')) return;
+      try {
+         const { data } = await updateWatchTime(seconds);
+         console.log(`⏱️ Watch time updated: +${seconds}s. Total watch time in DB: ${data.watchTime}s.`);
+      } catch (err) {
+         console.error("Failed to update watch time:", err);
+      }
+   };
 
    const handleLike = async () => {
       if (!localStorage.getItem('token')) return navigate('/login');
@@ -185,6 +229,10 @@ const VideoFrame = ({ video: initialVideo }) => {
 
          setIsSubscribed(data.isSubscribed);
          setSubCount(data.subscribers);
+
+         const creatorName = (typeof video.creator === 'object' ? video.creator.name : video.creator) || "Creator";
+         setToastMessage(data.isSubscribed ? `Subscribed to ${creatorName}` : `Unsubscribed from ${creatorName}`);
+         setTimeout(() => setToastMessage(null), 3000);
 
          // Update local storage user following list
          const updatedUser = { ...currentUser };
@@ -294,7 +342,6 @@ const VideoFrame = ({ video: initialVideo }) => {
 
    const isLiked = video.likes?.includes(user._id);
    const isDisliked = video.dislikes?.includes(user._id);
-
    return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 pb-20">
          {/* Main Player Section */}
@@ -304,6 +351,8 @@ const VideoFrame = ({ video: initialVideo }) => {
                poster={video.thumbnail || video.thumbnailUrl}
                onNext={handleNext}
                onPrevious={handlePrevious}
+               onDurationLoaded={handleDurationLoaded}
+               onTimePing={handleTimePing}
             />
 
             <div className="space-y-4 md:space-y-6 px-4 sm:px-0">
@@ -311,15 +360,28 @@ const VideoFrame = ({ video: initialVideo }) => {
 
                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 pb-4 md:pb-6 border-b border-white/5">
                   <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto">
-                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/5 shadow-inner">
-                        <AvatarImage src={video.creator?.avatar} name={video.creator?.name} socketUrl={SOCKET_URL} />
-                     </div>
-                     <div className="space-y-0.5 md:space-y-1 min-w-0 flex-1 md:flex-none">
-                        <h4 className="font-bold text-white flex items-center gap-1.5 md:gap-2 text-sm md:text-base truncate">
-                           <span className="truncate">{(typeof video.creator === 'object' ? video.creator.name : video.creator) || "Unknown Creator"}</span> <CheckCircleIcon />
-                        </h4>
-                        <p className="text-[8px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest">{subCount.toLocaleString()} Subscribers</p>
-                     </div>
+                     {(() => {
+                        const creatorId = video.creator?._id || video.creator;
+                        return (
+                           <>
+                              <div 
+                                 onClick={() => creatorId && navigate(`/creator/${creatorId}`)}
+                                 className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/5 shadow-inner cursor-pointer hover:opacity-80 transition-all"
+                              >
+                                 <AvatarImage src={video.creator?.avatar} name={video.creator?.name} socketUrl={SOCKET_URL} />
+                              </div>
+                              <div className="space-y-0.5 md:space-y-1 min-w-0 flex-1 md:flex-none">
+                                 <h4 
+                                    onClick={() => creatorId && navigate(`/creator/${creatorId}`)}
+                                    className="font-bold text-white flex items-center gap-1.5 md:gap-2 text-sm md:text-base truncate cursor-pointer hover:text-primary transition-all"
+                                 >
+                                    <span className="truncate">{(typeof video.creator === 'object' ? video.creator.name : video.creator) || "Unknown Creator"}</span> <CheckCircleIcon />
+                                 </h4>
+                                 <p className="text-[8px] md:text-[10px] text-slate-500 font-black uppercase tracking-widest">{subCount.toLocaleString()} Subscribers</p>
+                              </div>
+                           </>
+                        );
+                     })()}
                      {(() => {
                         const creatorId = video.creator?._id || video.creator;
                         const currentUser = JSON.parse(localStorage.getItem('user')) || {};
@@ -385,14 +447,15 @@ const VideoFrame = ({ video: initialVideo }) => {
                {/* Description Card */}
                <div className="glass-card p-4 md:p-6 space-y-2 md:space-y-3 hover:bg-white/5 transition-all group cursor-pointer">
                   <div className="flex flex-wrap gap-3 md:gap-4 text-[10px] md:text-xs font-black text-white uppercase tracking-widest">
-                     <span>1.2M Views</span>
-                     <span>2 Days Ago</span>
-                     <span className="text-primary">#Trending</span>
+                     <span>{(video.views || 0).toLocaleString()} Views</span>
+                     <span>{video.createdAt ? `${formatDistanceToNow(new Date(video.createdAt))} ago` : 'Recently'}</span>
+                     {video.category && <span className="text-primary">#{video.category}</span>}
+                     {video.tags && video.tags.slice(0, 3).map((tag, idx) => (
+                        <span key={idx} className="text-primary">#{tag.trim()}</span>
+                     ))}
                   </div>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all">
-                     The most anticipated release of the year is finally here. In this episode, we dive deep into the core mechanics of cinematic storytelling and explore the visual language used by top directors.
-                     <br /><br />
-                     Follow us on social media for more updates and behind-the-scenes content!
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all whitespace-pre-line">
+                     {video.description || "No description provided."}
                   </p>
                </div>
 
@@ -611,6 +674,21 @@ const VideoFrame = ({ video: initialVideo }) => {
                ))}
             </div>
          </div>
+
+         {/* In-app Toast Banner */}
+         <AnimatePresence>
+            {toastMessage && (
+               <motion.div
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                  className="fixed bottom-6 left-6 z-[9999] bg-dark-lighter border border-white/10 px-6 py-3.5 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.6)] flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white backdrop-blur-xl"
+               >
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  {toastMessage}
+               </motion.div>
+            )}
+         </AnimatePresence>
       </div>
    );
 };

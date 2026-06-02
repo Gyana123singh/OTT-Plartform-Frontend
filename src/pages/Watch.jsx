@@ -6,11 +6,11 @@ import { getVideoById } from '../services/api';
 const Watch = () => {
   const { id } = useParams();
   const location = useLocation();
-  const [video, setVideo] = useState(location.state?.video || null);
-  const [loading, setLoading] = useState(!video);
+  const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!video && id) {
+    if (id) {
       const fetchVideo = async () => {
         try {
           const { data } = await getVideoById(id);
@@ -23,7 +23,7 @@ const Watch = () => {
       };
       fetchVideo();
     }
-  }, [id, video]);
+  }, [id]);
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">

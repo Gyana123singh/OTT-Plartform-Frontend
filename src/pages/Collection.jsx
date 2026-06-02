@@ -108,7 +108,9 @@ const Collection = () => {
                 <div className="aspect-video bg-slate-800 rounded-[2rem] overflow-hidden relative border border-white/5 shadow-2xl group-hover:border-primary/50 transition-all duration-500">
                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                    <div className="absolute top-4 right-4 z-20">
-                      <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-widest border border-white/10">12:45</span>
+                      <span className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black text-white uppercase tracking-widest border border-white/10">
+                         {["04:32", "08:15", "11:04", "15:40", "03:12", "06:48"][(i - 1) % 6]}
+                      </span>
                    </div>
                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
                       <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40">

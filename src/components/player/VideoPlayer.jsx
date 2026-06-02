@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const VideoPlayer = ({ src, poster, onNext, onPrevious }) => {
+const VideoPlayer = ({ src, poster, onNext, onPrevious, onDurationLoaded, onTimePing }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -38,6 +38,31 @@ const VideoPlayer = ({ src, poster, onNext, onPrevious }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+  const activeSecondsRef = useRef(0);
+
+  // Dynamic YouTube-like Watch Time Tracker
+  useEffect(() => {
+    if (!isPlaying) {
+      activeSecondsRef.current = 0;
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (videoRef.current && !videoRef.current.paused && videoRef.current.readyState >= 3) {
+        activeSecondsRef.current += 1;
+        if (activeSecondsRef.current >= 5) {
+          activeSecondsRef.current = 0;
+          if (onTimePing) {
+            onTimePing(5);
+          }
+        }
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isPlaying, onTimePing]);
 
   const formatTime = (seconds) => {
     if (isNaN(seconds)) return '00:00';
@@ -137,7 +162,14 @@ const VideoPlayer = ({ src, poster, onNext, onPrevious }) => {
         src={src}
         poster={poster}
         onTimeUpdate={handleProgress}
-        onLoadedMetadata={(e) => setDuration(e.target.duration)}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+        onLoadedMetadata={(e) => {
+          const dur = e.target.duration;
+          setDuration(dur);
+          if (onDurationLoaded) onDurationLoaded(dur);
+        }}
         onClick={togglePlay}
         className="w-full h-full object-contain cursor-pointer"
       />

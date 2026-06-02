@@ -299,13 +299,29 @@ const Home = () => {
                 </div>
               </div>
               <div className="mt-3 flex gap-3">
-                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/5 shadow-inner">
+                 <div 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     const creatorId = video.creator?._id || video.creator;
+                     if (creatorId) navigate(`/creator/${creatorId}`);
+                   }}
+                   className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden shrink-0 border border-white/5 shadow-inner cursor-pointer hover:opacity-80 transition-opacity"
+                 >
                     <AvatarImage src={video.creator?.avatar} name={video.creator?.name} socketUrl={SOCKET_URL} />
                  </div>
                  <div className="space-y-0.5 min-w-0">
                     <h4 className="font-bold text-white text-sm line-clamp-1 group-hover:text-primary transition-colors leading-tight">{video.title}</h4>
                     <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
-                       <span className="truncate">{(typeof video.creator === 'object' ? video.creator.name : video.creator) || "G Plus Creator"}</span>
+                       <span 
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           const creatorId = video.creator?._id || video.creator;
+                           if (creatorId) navigate(`/creator/${creatorId}`);
+                         }}
+                         className="truncate cursor-pointer hover:text-primary transition-colors"
+                       >
+                         {(typeof video.creator === 'object' ? video.creator.name : video.creator) || "G Plus Creator"}
+                       </span>
                        <span className="w-1 h-1 bg-slate-700 rounded-full shrink-0" />
                        <span className="shrink-0">{video.views || 0} Views</span>
                     </div>
