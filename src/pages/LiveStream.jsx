@@ -1143,7 +1143,7 @@ const LiveStream = () => {
                   <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-accent p-0.5">
                     <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
                       {spotlightStream.creator?.avatar ? (
-                        <img src={`${SOCKET_URL}/${spotlightStream.creator.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                        <img src={spotlightStream.creator.avatar.startsWith('http') ? spotlightStream.creator.avatar : `${SOCKET_URL}/${spotlightStream.creator.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs">
                           {spotlightStream.creator?.name?.charAt(0) || spotlightStream.creator?.charAt(0) || "G"}
@@ -1311,7 +1311,7 @@ const LiveStream = () => {
                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-accent p-0.5 shrink-0">
                           <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
                             {creatorAvatar ? (
-                              <img src={`${SOCKET_URL}/${creatorAvatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                              <img src={creatorAvatar.startsWith('http') ? creatorAvatar : `${SOCKET_URL}/${creatorAvatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-[10px]">
                                 {creatorName.charAt(0)}
@@ -1719,7 +1719,7 @@ const LiveStream = () => {
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-primary to-accent p-0.5 shrink-0">
                 <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
                   {streamData?.creator?.avatar ? (
-                    <img src={`${SOCKET_URL}/${streamData.creator.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                    <img src={streamData.creator.avatar.startsWith('http') ? streamData.creator.avatar : `${SOCKET_URL}/${streamData.creator.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-xs">
                       {streamData?.creator?.name?.charAt(0) || streamData?.creator?.charAt(0) || "G"}
@@ -1818,7 +1818,7 @@ const LiveStream = () => {
                         <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-primary to-accent p-0.5 shrink-0">
                           <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
                             {creatorAvatar ? (
-                              <img src={`${SOCKET_URL}/${creatorAvatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                              <img src={creatorAvatar.startsWith('http') ? creatorAvatar : `${SOCKET_URL}/${creatorAvatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-[8px]">
                                 {creatorName.charAt(0)}
@@ -2091,7 +2091,7 @@ const LiveStream = () => {
                   >
                     <div className="w-4 h-4 rounded-full overflow-hidden bg-white/10 shrink-0">
                       {m.avatar ? (
-                        <img src={`${SOCKET_URL}/${m.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                        <img src={m.avatar.startsWith('http') ? m.avatar : `${SOCKET_URL}/${m.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-slate-600 flex items-center justify-center text-[8px] font-black text-white uppercase">
                           {m.user.charAt(0)}
@@ -2125,7 +2125,7 @@ const LiveStream = () => {
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full overflow-hidden bg-white/20 shrink-0">
                     {selectedPinnedSuperChat.avatar ? (
-                      <img src={`${SOCKET_URL}/${selectedPinnedSuperChat.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover" />
+                      <img src={selectedPinnedSuperChat.avatar.startsWith('http') ? selectedPinnedSuperChat.avatar : `${SOCKET_URL}/${selectedPinnedSuperChat.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-slate-600 flex items-center justify-center text-[9px] font-bold text-white">
                         {selectedPinnedSuperChat.user.charAt(0)}
@@ -2205,7 +2205,7 @@ const LiveStream = () => {
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full overflow-hidden bg-white/20 p-0.5 shrink-0 border border-white/20">
                         {msg.avatar ? (
-                          <img src={`${SOCKET_URL}/${msg.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover rounded-full" />
+                          <img src={msg.avatar.startsWith('http') ? msg.avatar : `${SOCKET_URL}/${msg.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full" />
                         ) : (
                           <div className="w-full h-full bg-slate-600 flex items-center justify-center text-[10px] font-black text-white uppercase rounded-full">
                             {msg.user.charAt(0)}
@@ -2231,7 +2231,7 @@ const LiveStream = () => {
               <div key={msg.id} className="flex gap-2.5 items-start text-xs text-left group hover:bg-white/5 p-1 rounded-lg transition-all duration-200 animate-in fade-in duration-300">
                 <div className="w-7 h-7 rounded-full overflow-hidden bg-white/5 shrink-0 border border-white/10 p-0.5 mt-0.5">
                   {msg.avatar ? (
-                    <img src={`${SOCKET_URL}/${msg.avatar.replace(/\\/g, '/')}`} alt="" className="w-full h-full object-cover rounded-full" />
+                    <img src={msg.avatar.startsWith('http') ? msg.avatar : `${SOCKET_URL}/${msg.avatar.replace(/\\/g, '/').replace(/^\//, '')}`} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-300 uppercase rounded-full">
                       {msg.user.charAt(0)}

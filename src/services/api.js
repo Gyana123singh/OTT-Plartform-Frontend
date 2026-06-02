@@ -5,6 +5,7 @@ export const register = (userData) => axiosInstance.post('/auth/register', userD
 export const login = (credentials) => axiosInstance.post('/auth/login', credentials);
 export const googleLogin = (credential) => axiosInstance.post('/auth/google', { credential });
 export const getProfile = () => axiosInstance.get('/auth/profile');
+export const getCreatorStats = () => axiosInstance.get('/auth/creator-stats');
 export const updateProfile = (formData) => axiosInstance.put('/auth/profile', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 });

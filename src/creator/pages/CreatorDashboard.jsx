@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   BarChart3, 
   Users, 
@@ -9,6 +9,7 @@ import {
   Video, 
   Settings,
   ChevronRight,
+  ChevronLeft,
   Plus,
   Eye,
   Heart,
@@ -18,9 +19,10 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import StreamConfigModal from '../components/StreamConfigModal';
 import UploadMediaModal from '../components/UploadMediaModal';
-import { getCreatorVideos, becomeCreator } from '../../services/api';
+import { getCreatorVideos, becomeCreator, getCreatorStats } from '../../services/api';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
 
@@ -32,6 +34,44 @@ const CreatorDashboard = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {});
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const videosPerPage = 5;
+
+  // Reset page to 1 when video data updates
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [videos]);
+
+  const totalPages = Math.ceil(videos.length / videosPerPage);
+
+  const currentVideos = useMemo(() => {
+    const indexOfLastVideo = currentPage * videosPerPage;
+    const indexOfFirstVideo = indexOfLastVideo - videosPerPage;
+    return videos.slice(indexOfFirstVideo, indexOfLastVideo);
+  }, [videos, currentPage]);
+
+  // Dynamic Live Stats State
+  const [liveStats, setLiveStats] = useState({
+    totalViews: 0,
+    subscribersCount: 0,
+    engagementRate: '0.0%',
+    revenue: '₹0'
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [animateSubscribers, setAnimateSubscribers] = useState(false);
+
+  const fetchStats = async () => {
+    try {
+      const { data } = await getCreatorStats();
+      setLiveStats(data);
+    } catch (error) {
+      console.error("Error loading creator stats:", error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const handleBecomeCreator = async () => {
     try {
@@ -61,7 +101,49 @@ const CreatorDashboard = () => {
     };
 
     fetchMyVideos();
+    fetchStats();
   }, []);
+
+  // WebRTC / Socket.io Client for Live Real-Time Dashboard Updates
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    
+    if (!token || !storedUser?._id) return;
+
+    const socket = io(SOCKET_URL, {
+      auth: { token }
+    });
+
+    socket.on('connect', () => {
+      console.log('📡 Creator Dashboard dynamic live channel connected');
+      socket.emit('join_user_room', storedUser._id);
+    });
+
+    socket.on('new_notification', (newNotif) => {
+      console.log('🔔 Creator Dashboard received real-time signal:', newNotif);
+      
+      if (newNotif.type === 'follow') {
+        // Dynamically increment subscribers with scale pop HSL animation in real time
+        setLiveStats(prev => ({
+          ...prev,
+          subscribersCount: prev.subscribersCount + 1
+        }));
+        setAnimateSubscribers(true);
+        setTimeout(() => setAnimateSubscribers(false), 1000);
+      }
+      
+      // Auto-reload dashboard statistics when payments, super chats, comments, or updates occur
+      if (newNotif.type === 'gift' || newNotif.type === 'comment' || newNotif.type === 'live') {
+        fetchStats();
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     if (location.state?.openStreamModal) {
       setIsStreamModalOpen(true);
@@ -69,11 +151,37 @@ const CreatorDashboard = () => {
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state]);
+
   const stats = [
-    { label: "Total Views", value: videos.reduce((acc, v) => acc + v.views, 0).toLocaleString(), icon: Eye, color: "text-blue-500", trend: "+12.5%" },
-    { label: "Subscribers", value: "24.8K", icon: Users, color: "text-primary", trend: "+4.2%" },
-    { label: "Engagement", value: "8.2%", icon: Heart, color: "text-accent", trend: "+1.1%" },
-    { label: "Revenue", value: "₹42,850", icon: TrendingUp, color: "text-emerald-500", trend: "+25.8%" },
+    { 
+      label: "Total Views", 
+      value: statsLoading ? "..." : liveStats.totalViews.toLocaleString(), 
+      icon: Eye, 
+      color: "text-blue-500", 
+      trend: "+12.5%" 
+    },
+    { 
+      label: "Subscribers", 
+      value: statsLoading ? "..." : liveStats.subscribersCount.toLocaleString(), 
+      icon: Users, 
+      color: "text-primary", 
+      trend: "+4.2%",
+      animate: animateSubscribers
+    },
+    { 
+      label: "Engagement", 
+      value: statsLoading ? "..." : liveStats.engagementRate, 
+      icon: Heart, 
+      color: "text-accent", 
+      trend: "+1.1%" 
+    },
+    { 
+      label: "Revenue", 
+      value: statsLoading ? "..." : liveStats.revenue, 
+      icon: TrendingUp, 
+      color: "text-emerald-500", 
+      trend: "+25.8%" 
+    },
   ];
 
   const plan = user.subscription?.plan || "Free";
@@ -186,8 +294,16 @@ const CreatorDashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="glass-card p-4 md:p-6 space-y-3 md:space-y-4"
+            className="glass-card p-4 md:p-6 space-y-3 md:space-y-4 relative overflow-hidden group"
           >
+            {stat.animate && (
+              <motion.div 
+                className="absolute inset-0 bg-primary/10 -z-10"
+                initial={{ opacity: 0.8, scale: 0.9 }}
+                animate={{ opacity: 0, scale: 1.1 }}
+                transition={{ duration: 0.8 }}
+              />
+            )}
             <div className="flex items-center justify-between">
               <div className={`p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-white/5 ${stat.color}`}>
                 <stat.icon size={18} className="md:w-6 md:h-6" />
@@ -198,7 +314,13 @@ const CreatorDashboard = () => {
             </div>
             <div>
               <p className="text-[8px] md:text-xs font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
-              <h3 className="text-lg md:text-2xl font-black text-white mt-0.5 md:mt-1 truncate">{stat.value}</h3>
+              <motion.h3 
+                animate={stat.animate ? { scale: [1, 1.2, 1], color: ['#fff', '#ec4899', '#fff'] } : {}}
+                transition={{ duration: 0.6 }}
+                className="text-lg md:text-2xl font-black text-white mt-0.5 md:mt-1 truncate"
+              >
+                {stat.value}
+              </motion.h3>
             </div>
           </motion.div>
         ))}
@@ -224,7 +346,7 @@ const CreatorDashboard = () => {
                  <Video size={40} className="text-slate-500" />
                  <p className="text-sm font-bold">No content uploaded yet.<br/>Start your journey today!</p>
                </div>
-            ) : videos.map((video) => (
+            ) : currentVideos.map((video) => (
               <div key={video._id} className="glass-card p-3 md:p-4 flex items-center gap-3 md:gap-4 hover:bg-white/5 transition-all group">
                 <div className="w-20 md:w-24 aspect-video bg-slate-800 rounded-lg overflow-hidden shrink-0 relative">
                   {video.thumbnail && (
@@ -246,6 +368,58 @@ const CreatorDashboard = () => {
                 <button className="p-1.5 md:p-2 hover:bg-white/10 rounded-lg text-slate-500 shrink-0"><Settings size={16} className="md:w-[18px] md:h-[18px]" /></button>
               </div>
             ))}
+
+            {/* Premium Pagination Controls */}
+            {!loading && totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-white/5 px-1">
+                <div className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-widest">
+                  Showing Page <span className="text-white font-black">{currentPage}</span> of <span className="text-white font-black">{totalPages}</span> ({videos.length} videos)
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                    title="Previous Page"
+                  >
+                    <ChevronLeft size={14} />
+                  </motion.button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const pageNumber = index + 1;
+                      const isActive = currentPage === pageNumber;
+                      return (
+                        <motion.button
+                          key={pageNumber}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setCurrentPage(pageNumber)}
+                          className={`w-8 h-8 flex items-center justify-center rounded-xl text-[10px] font-bold transition-all border ${
+                            isActive
+                              ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                              : "bg-white/5 border-white/5 text-slate-500 hover:text-white hover:bg-white/10 hover:border-white/10"
+                          }`}
+                        >
+                          {pageNumber}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                    title="Next Page"
+                  >
+                    <ChevronRight size={14} />
+                  </motion.button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

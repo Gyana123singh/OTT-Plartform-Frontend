@@ -89,7 +89,7 @@ const ToastItem = ({ toast, onClose, onClick }) => {
   if (toast.sender && toast.sender.avatar) {
     avatarUrl = toast.sender.avatar.startsWith('http') || toast.sender.avatar.startsWith('data:')
       ? toast.sender.avatar
-      : `${SOCKET_URL}/${toast.sender.avatar.replace(/\\/g, '/')}`;
+      : `${SOCKET_URL}/${toast.sender.avatar.replace(/\\/g, '/').replace(/^\//, '')}`;
   }
 
   return (
@@ -106,6 +106,7 @@ const ToastItem = ({ toast, onClose, onClick }) => {
           <img 
             src={avatarUrl} 
             alt={toast.sender?.name || 'Sender'} 
+            referrerPolicy="no-referrer"
             className="w-10 h-10 rounded-full object-cover border border-white/10" 
           />
         ) : (
@@ -348,7 +349,7 @@ const NotificationCenter = ({ isOpen, onClose, onUnreadChange }) => {
                     if (notif.sender && notif.sender.avatar) {
                       avatarUrl = notif.sender.avatar.startsWith('http') || notif.sender.avatar.startsWith('data:')
                         ? notif.sender.avatar
-                        : `${SOCKET_URL}/${notif.sender.avatar.replace(/\\/g, '/')}`;
+                        : `${SOCKET_URL}/${notif.sender.avatar.replace(/\\/g, '/').replace(/^\//, '')}`;
                     }
 
                     return (
@@ -370,6 +371,7 @@ const NotificationCenter = ({ isOpen, onClose, onUnreadChange }) => {
                             <img 
                               src={avatarUrl} 
                               alt={notif.sender?.name || 'Sender'} 
+                              referrerPolicy="no-referrer"
                               className="w-10 h-10 rounded-full object-cover border border-white/10" 
                             />
                           ) : (

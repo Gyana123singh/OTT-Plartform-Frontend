@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Settings, 
   Edit3, 
@@ -8,6 +8,7 @@ import {
   Bell, 
   LogOut,
   ChevronRight,
+  ChevronLeft,
   Shield,
   CreditCard,
   Camera,
@@ -38,6 +39,33 @@ const Profile = () => {
   
   // Active Content Section ('uploads', 'security', 'notifications', 'billing', 'history', 'liked')
   const [activeSection, setActiveSection] = useState('uploads');
+
+  // Pagination for watch history
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPerPage = 5;
+
+  // Reset page to 1 when watchHistory or activeSection changes
+  useEffect(() => {
+    setHistoryPage(1);
+  }, [profile?.watchHistory, activeSection]);
+
+  const paginatedHistory = useMemo(() => {
+    if (!profile?.watchHistory) return [];
+    const validHistory = profile.watchHistory.filter(item => item && item.video);
+    const start = (historyPage - 1) * historyPerPage;
+    return validHistory.slice(start, start + historyPerPage);
+  }, [profile?.watchHistory, historyPage, historyPerPage]);
+
+  const historyTotalPages = useMemo(() => {
+    if (!profile?.watchHistory) return 0;
+    const validHistory = profile.watchHistory.filter(item => item && item.video);
+    return Math.ceil(validHistory.length / historyPerPage);
+  }, [profile?.watchHistory, historyPerPage]);
+
+  const totalHistoryCount = useMemo(() => {
+    if (!profile?.watchHistory) return 0;
+    return profile.watchHistory.filter(item => item && item.video).length;
+  }, [profile?.watchHistory]);
 
   // Dynamic Videos list
   const [videos, setVideos] = useState([]);
@@ -295,7 +323,8 @@ const Profile = () => {
   const getAvatarUrl = (avatar) => {
     if (!avatar) return '';
     if (avatar.startsWith('http') || avatar.startsWith('data:')) return avatar;
-    return `${SOCKET_URL}/${avatar.replace(/\\/g, '/')}`;
+    const cleanPath = avatar.replace(/\\/g, '/').replace(/^\//, '');
+    return `${SOCKET_URL}/${cleanPath}`;
   };
 
   // Helper to resolve video duration with dynamic fallback
@@ -369,6 +398,7 @@ const Profile = () => {
                   <img 
                     src={getAvatarUrl(profile.avatar)} 
                     alt={profile.name} 
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : (
@@ -755,7 +785,7 @@ const Profile = () => {
 
                  {profile?.watchHistory && profile.watchHistory.length > 0 ? (
                    <div className="space-y-3 pt-2">
-                     {profile.watchHistory.map((item) => {
+                     {paginatedHistory.map((item) => {
                        const video = item.video;
                        if (!video) return null;
                        return (
@@ -786,6 +816,58 @@ const Profile = () => {
                          </div>
                        );
                      })}
+
+                     {/* Premium Pagination Controls */}
+                     {historyTotalPages > 1 && (
+                       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-white/5 px-1">
+                         <div className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-widest">
+                           Showing Page <span className="text-white font-black">{historyPage}</span> of <span className="text-white font-black">{historyTotalPages}</span> ({totalHistoryCount} videos)
+                         </div>
+
+                         <div className="flex items-center gap-2">
+                           <motion.button
+                             whileTap={{ scale: 0.95 }}
+                             onClick={() => setHistoryPage(prev => Math.max(prev - 1, 1))}
+                             disabled={historyPage === 1}
+                             className="flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                             title="Previous Page"
+                           >
+                             <ChevronLeft size={14} />
+                           </motion.button>
+
+                           <div className="flex items-center gap-1">
+                             {Array.from({ length: historyTotalPages }, (_, index) => {
+                               const pageNumber = index + 1;
+                               const isActive = historyPage === pageNumber;
+                               return (
+                                 <motion.button
+                                   key={pageNumber}
+                                   whileTap={{ scale: 0.95 }}
+                                   onClick={() => setHistoryPage(pageNumber)}
+                                   className={`w-8 h-8 flex items-center justify-center rounded-xl text-[10px] font-bold transition-all border ${
+                                     isActive
+                                       ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                                       : "bg-white/5 border-white/5 text-slate-500 hover:text-white hover:bg-white/10 hover:border-white/10"
+                                   }`}
+                                 >
+                                   {pageNumber}
+                                 </motion.button>
+                               );
+                             })}
+                           </div>
+
+                           <motion.button
+                             whileTap={{ scale: 0.95 }}
+                             onClick={() => setHistoryPage(prev => Math.min(prev + 1, historyTotalPages))}
+                             disabled={historyPage === historyTotalPages}
+                             className="flex items-center justify-center p-2.5 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                             title="Next Page"
+                           >
+                             <ChevronRight size={14} />
+                           </motion.button>
+                         </div>
+                       </div>
+                     )}
                    </div>
                  ) : (
                    <div className="text-center py-10 space-y-2">
@@ -856,7 +938,7 @@ const Profile = () => {
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-24 h-24 rounded-full relative overflow-hidden group border border-white/10">
                       {avatarPreview ? (
-                        <img src={getAvatarUrl(avatarPreview)} alt="Preview" className="w-full h-full object-cover" />
+                        <img src={getAvatarUrl(avatarPreview)} alt="Preview" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
                           <Users size={32} />

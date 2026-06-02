@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Play, TrendingUp, Star, Clock, Eye, User, ChevronRight, Calendar, Users, Globe } from 'lucide-react';
+import { Play, TrendingUp, Star, Clock, Eye, User, ChevronRight, ChevronLeft, Calendar, Users, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -56,13 +56,17 @@ const Home = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const videosPerPage = 8;
+
   // Fetch Content from Backend
   const fetchContent = async () => {
     try {
       setLoading(true);
       const [streamsRes, videosRes] = await Promise.all([
         getLiveStreams(),
-        getVideos({ limit: 8 }) // Fetch latest 8 videos
+        getVideos() // Fetch all videos for client-side pagination
       ]);
       setStreams(streamsRes.data);
       setVideos(videosRes.data);
@@ -75,6 +79,19 @@ const Home = () => {
       setLoading(false);
     }
   };
+
+  // Reset page to 1 when video data updates
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [videos]);
+
+  const totalPages = Math.ceil(videos.length / videosPerPage);
+
+  const currentVideos = useMemo(() => {
+    const indexOfLastVideo = currentPage * videosPerPage;
+    const indexOfFirstVideo = indexOfLastVideo - videosPerPage;
+    return videos.slice(indexOfFirstVideo, indexOfLastVideo);
+  }, [videos, currentPage]);
 
   useEffect(() => {
     fetchContent();
@@ -230,13 +247,14 @@ const Home = () => {
                   <div
                     className={cn(
                       "w-10 h-10 rounded-2xl shrink-0 shadow-lg bg-slate-700 overflow-hidden",
-                      !stream.creator?.avatar?.includes('/') && (stream.avatar || 'bg-primary/20')
+                      (!stream.creator?.avatar || !stream.creator.avatar.includes('/')) && (stream.avatar || 'bg-primary/20')
                     )}
                   >
-                    {stream.creator?.avatar?.includes('/') && (
+                    {stream.creator?.avatar && (
                       <img
-                        src={`${SOCKET_URL}/${stream.creator.avatar.replace(/\\/g, '/')}`}
+                        src={stream.creator.avatar.startsWith('http') ? stream.creator.avatar : `${SOCKET_URL}/${stream.creator.avatar.replace(/\\/g, '/').replace(/^\//, '')}`}
                         alt=""
+                        referrerPolicy="no-referrer"
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -276,7 +294,7 @@ const Home = () => {
             <div className="col-span-full py-10 text-center text-slate-500 text-sm font-bold uppercase tracking-widest bg-white/5 rounded-3xl border border-dashed border-white/10">
               No videos uploaded yet
             </div>
-          ) : videos.map((video) => (
+          ) : currentVideos.map((video) => (
             <motion.div
               key={video._id}
               whileHover={{ y: -5 }}
@@ -330,6 +348,59 @@ const Home = () => {
             </motion.div>
           ))}
         </div>
+
+        {/* Premium Pagination Controls */}
+        {!loading && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-white/5 px-2">
+            <div className="text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-widest">
+              Showing Page <span className="text-white font-black">{currentPage}</span> of <span className="text-white font-black">{totalPages}</span> ({videos.length} videos)
+            </div>
+
+            <div className="flex items-center gap-2">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="flex items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                title="Previous Page"
+              >
+                <ChevronLeft size={16} />
+              </motion.button>
+
+              <div className="flex items-center gap-1.5">
+                {Array.from({ length: totalPages }, (_, index) => {
+                  const pageNumber = index + 1;
+                  const isActive = currentPage === pageNumber;
+                  return (
+                    <motion.button
+                      key={pageNumber}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentPage(pageNumber)}
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center rounded-2xl text-xs font-bold transition-all border",
+                        isActive
+                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                          : "bg-white/5 border-white/5 text-slate-500 hover:text-white hover:bg-white/10 hover:border-white/10"
+                      )}
+                    >
+                      {pageNumber}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="flex items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 text-slate-300 hover:text-white disabled:opacity-20 disabled:hover:bg-white/5 disabled:hover:border-white/5 disabled:cursor-not-allowed transition-all"
+                title="Next Page"
+              >
+                <ChevronRight size={16} />
+              </motion.button>
+            </div>
+          </div>
+        )}
       </section>
       <div className="space-y-4 md:space-y-6">
         <div className="flex items-center justify-between px-2">
