@@ -1097,7 +1097,7 @@ const LiveStream = () => {
     return (
       <div className="max-w-7xl mx-auto py-6 md:py-10 px-0 space-y-8 md:space-y-12">
         {/* Page Hero Spotlight Header */}
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-red-900/40 via-purple-950/20 to-dark border border-white/5 shadow-2xl p-6 md:p-12 flex flex-col md:flex-row gap-8 items-center">
+        <div className="relative rounded-none sm:rounded-3xl overflow-hidden bg-gradient-to-r from-red-900/40 via-purple-950/20 to-dark border-y sm:border border-white/5 shadow-2xl p-6 md:p-12 flex flex-col md:flex-row gap-8 items-center">
           {/* Neon Orb background */}
           <div className="absolute top-0 right-1/4 w-72 h-72 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-0 left-10 w-48 h-48 bg-red-600/5 rounded-full blur-[80px] pointer-events-none" />
@@ -1128,7 +1128,7 @@ const LiveStream = () => {
               </div>
 
               {/* Spotlight Metadata */}
-              <div className="flex-1 space-y-4 md:space-y-5 text-left">
+              <div className="flex-1 space-y-4 md:space-y-5 text-center md:text-left flex flex-col items-center md:items-start justify-center w-full">
                 <div className="flex items-center gap-2">
                   <Sparkles size={16} className="text-primary" />
                   <span className="text-xs font-black uppercase tracking-widest text-primary">FEATURED CHANNEL</span>
@@ -1151,7 +1151,7 @@ const LiveStream = () => {
                       )}
                     </div>
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h4 className="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
                       {spotlightStream.creator?.name || spotlightStream.creator || "G Plus Streamer"}
                       <span className="w-2.5 h-2.5 bg-blue-400 rounded-full" />
@@ -1161,7 +1161,7 @@ const LiveStream = () => {
                 </div>
                 <button 
                   onClick={() => navigate(`/live/${spotlightStream._id}`, { state: { video: spotlightStream } })}
-                  className="btn-primary py-3.5 px-8 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                  className="btn-primary py-3.5 px-8 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 w-full sm:w-auto"
                 >
                   <Play size={14} fill="currentColor" /> TUNE IN NOW
                 </button>
@@ -1184,7 +1184,7 @@ const LiveStream = () => {
               </div>
 
               {/* Spotlight Metadata */}
-              <div className="flex-1 space-y-4 md:space-y-5 text-left">
+              <div className="flex-1 space-y-4 md:space-y-5 text-center md:text-left flex flex-col items-center md:items-start justify-center w-full">
                 <div className="flex items-center gap-2">
                   <Compass size={16} className="text-red-500" />
                   <span className="text-xs font-black uppercase tracking-widest text-slate-400">Broadcaster Space</span>
@@ -1195,10 +1195,10 @@ const LiveStream = () => {
                 <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                   Join G Plus Live! Experience ultra-low latency WebRTC streaming, high-fidelity browser canvas rendering, instant live chat, and a seamless global community.
                 </p>
-                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <div className="pt-2 flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center justify-center md:justify-start">
                   <button 
                     onClick={handleCreateBroadcastClick}
-                    className="btn-primary py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                    className="btn-primary py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 w-full sm:w-auto"
                   >
                     <Plus size={16} /> START BROADCASTING
                   </button>
@@ -1207,7 +1207,7 @@ const LiveStream = () => {
                       const gamingCategory = document.getElementById("Gaming-feed");
                       if (gamingCategory) gamingCategory.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-black text-xs uppercase tracking-widest text-white transition-all flex items-center justify-center gap-1"
+                    className="py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl font-black text-xs uppercase tracking-widest text-white transition-all flex items-center justify-center gap-1 w-full sm:w-auto"
                   >
                     DISCOVER FEEDS
                   </button>
@@ -1220,7 +1220,7 @@ const LiveStream = () => {
         {/* Live Catalog Feed Section */}
         <div className="space-y-6 md:space-y-8" id="Gaming-feed">
           {/* Header & Filter Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5 px-4 sm:px-0">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center border border-red-500/20 text-red-500">
                 <Tv size={16} />
@@ -1229,7 +1229,7 @@ const LiveStream = () => {
             </div>
             
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar px-4 sm:px-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
@@ -1255,7 +1255,7 @@ const LiveStream = () => {
             </div>
           ) : filteredStreams.length > 0 ? (
             /* Stream Grid */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 px-4 sm:px-0">
               {filteredStreams.map((stream) => {
                 const streamId = stream._id;
                 const creatorName = stream.creator?.name || stream.creator || "G Plus Streamer";
@@ -1336,7 +1336,7 @@ const LiveStream = () => {
             </div>
           ) : (
             /* Beautiful Empty State */
-            <div className="glass-card max-w-xl mx-auto py-12 px-6 rounded-3xl text-center space-y-5 border border-white/5">
+            <div className="glass-card max-w-xl mx-4 sm:mx-auto py-12 px-6 rounded-3xl text-center space-y-5 border border-white/5">
               <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 mx-auto text-slate-500">
                 <VideoOff size={28} />
               </div>
@@ -1360,7 +1360,7 @@ const LiveStream = () => {
   // Render 2: YouTube-like Stream Setup Control Room
   if (!id && showSetupRoom) {
     return (
-      <div className="max-w-6xl mx-auto py-6 md:py-10 px-0 space-y-6 md:space-y-8">
+      <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 sm:px-0 space-y-6 md:space-y-8">
          {/* YouTube-like Header */}
          <div className="flex items-center justify-between border-b border-white/5 pb-6 gap-4">
            <div className="flex items-center gap-4">
@@ -1687,7 +1687,7 @@ const LiveStream = () => {
         </div>
 
         {/* Stream Info */}
-        <div className="mt-4 md:mt-6 space-y-4">
+        <div className="mt-4 md:mt-6 space-y-4 px-4 sm:px-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
             <div className="min-w-0">
               <h1 className="text-xl md:text-2xl font-black text-white truncate">{streamData?.title || "Live Broadcast"}</h1>
@@ -1742,7 +1742,7 @@ const LiveStream = () => {
         </div>
 
         {/* Live Video Slider */}
-        <div className="mt-6 md:mt-8 space-y-4">
+        <div className="mt-6 md:mt-8 space-y-4 px-4 sm:px-0">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-sm md:text-base font-black text-white flex items-center gap-2 uppercase tracking-wider">
               <Radio size={16} className="text-primary animate-pulse" />

@@ -35,7 +35,6 @@ const NavItems = [
   { icon: Compass, label: 'Discovery', path: '/discovery' },
   { icon: Tv, label: 'Live Stream', path: '/live' },
   { icon: Video, label: 'Video Chat', path: '/video-chat' },
-  { icon: MessageSquare, label: 'Media Chat', path: '/media-chat' },
   { icon: Users, label: 'Communities', path: '/communities' },
   { icon: Newspaper, label: 'News', path: '/news' },
   { icon: Calendar, label: 'Events', path: '/events' },
@@ -53,6 +52,11 @@ const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isWatchPage = location.pathname.startsWith('/watch');
+  const isHomePage = location.pathname === '/';
+  const isDiscoveryPage = location.pathname === '/discovery';
+  const isLivePage = location.pathname.startsWith('/live');
+  const isCommunitiesPage = location.pathname.startsWith('/communities');
+  const isNewsPage = location.pathname.startsWith('/news');
 
   React.useEffect(() => {
     // Only show auth wall for unauthenticated users after 5 seconds
@@ -193,7 +197,10 @@ const MainLayout = () => {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+        <div className={cn(
+          "flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar",
+          (isHomePage || isDiscoveryPage || isLivePage || isCommunitiesPage || isNewsPage) ? "px-0 py-6 md:p-6" : "p-4 md:p-6"
+        )}>
           <Outlet />
         </div>
 

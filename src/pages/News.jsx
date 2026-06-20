@@ -354,9 +354,9 @@ const News = () => {
       )}
 
       {/* Main Title Banner & tab control panels */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row items-center lg:items-center justify-between gap-6 px-4 sm:px-0">
+        <div className="text-center lg:text-left flex flex-col items-center lg:items-start w-full">
+          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight flex items-center justify-center lg:justify-start gap-3">
             <Newspaper className="text-primary shrink-0" size={32} />
             <span>Worldwide GNews Matrix</span>
           </h1>
@@ -366,41 +366,41 @@ const News = () => {
         </div>
 
         {/* Dynamic tabs bar */}
-        <div className="flex items-center gap-2 bg-white/[0.02] border border-white/5 p-1.5 rounded-2xl shrink-0 shadow-inner">
+        <div className="flex items-center gap-1 sm:gap-2 bg-white/[0.02] border border-white/5 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl shrink-0 shadow-inner overflow-x-auto no-scrollbar max-w-full">
           <button
             onClick={() => { setActiveTab("feed"); setShowBookmarksOnly(false); }}
             className={clsx(
-              "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2",
+              "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
               activeTab === "feed" && !showBookmarksOnly
                 ? "bg-primary text-white shadow-md shadow-primary/20 scale-[0.98]"
                 : "text-slate-400 hover:text-white"
             )}
           >
-            <Newspaper size={14} /> LIVE MATRIX
+            <Newspaper className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> LIVE MATRIX
           </button>
           <button
             onClick={() => { setActiveTab("videos"); setShowBookmarksOnly(false); }}
             className={clsx(
-              "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2",
+              "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap",
               activeTab === "videos"
                 ? "bg-primary text-white shadow-md shadow-primary/20 scale-[0.98]"
                 : "text-slate-400 hover:text-white"
             )}
           >
-            <Tv size={14} /> VIDEO HEADLINES
+            <Tv className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> VIDEO HEADLINES
           </button>
           <button
             onClick={() => setShowBookmarksOnly(true)}
             className={clsx(
-              "px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 relative",
+              "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all flex items-center gap-1.5 sm:gap-2 relative whitespace-nowrap",
               showBookmarksOnly
                 ? "bg-amber-500 text-white shadow-md shadow-amber-500/20 scale-[0.98]"
                 : "text-slate-400 hover:text-amber-500"
             )}
           >
-            <Bookmark size={14} /> SAVED
+            <Bookmark className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> SAVED
             {bookmarks.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-amber-500 text-black text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black border-2 border-slate-900">
+              <span className="absolute -top-1 -right-1 bg-amber-500 text-black text-[8px] sm:text-[9px] w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center font-black border border-slate-900">
                 {bookmarks.length}
               </span>
             )}
@@ -411,7 +411,7 @@ const News = () => {
       {activeTab === "feed" && !showBookmarksOnly && (
         <div className="space-y-4">
           {/* Modular Search bar and Country filtering selector */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 sm:px-0">
             <div className="md:col-span-2">
               <SearchBar 
                 value={searchQuery}
@@ -444,41 +444,10 @@ const News = () => {
             </div>
           </div>
 
-          {/* Trending query terms */}
-          <div className="flex flex-col gap-2 border-t border-white/5 pt-3.5">
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-              <Flame size={12} className="text-orange-500 animate-pulse" />
-              <span>Hot query subjects</span>
-            </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
-              {TRENDING_TOPICS.map((topic) => (
-                <button
-                  key={topic.label}
-                  onClick={() => {
-                    if (activeTrendingTopic === topic.query) {
-                      setActiveTrendingTopic("");
-                    } else {
-                      setActiveTrendingTopic(topic.query);
-                      setSearchQuery("");
-                    }
-                  }}
-                  className={clsx(
-                    "px-4 py-2 rounded-xl text-xs font-black transition-all border shrink-0 flex items-center gap-1.5",
-                    activeTrendingTopic === topic.query
-                      ? "bg-white text-black border-white shadow-lg"
-                      : "bg-white/[0.01] border-white/5 text-slate-400 hover:border-white/10 hover:text-white"
-                  )}
-                >
-                  <Sparkles size={12} className={clsx(activeTrendingTopic === topic.query ? "text-primary" : "text-slate-500")} />
-                  <span>{topic.label.toUpperCase()}</span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Categories Tab selectors (highly responsive horizontal scroll) */}
           {!searchQuery && !activeTrendingTopic && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar select-none border-b border-white/5">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar select-none border-b border-white/5 px-4 sm:px-0">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -503,7 +472,7 @@ const News = () => {
         <AnimatePresence mode="wait">
           {activeTab === "feed" ? (
             loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-0">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
@@ -512,7 +481,7 @@ const News = () => {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="py-20 text-center space-y-4 max-w-sm mx-auto"
+                className="py-20 text-center space-y-4 max-w-sm mx-4 sm:mx-auto"
               >
                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20 text-red-500 mx-auto">
                   <RefreshCw size={24} className="animate-spin" />
@@ -534,7 +503,7 @@ const News = () => {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="py-24 text-center max-w-sm mx-auto space-y-3"
+                className="py-24 text-center max-w-sm mx-4 sm:mx-auto space-y-3"
               >
                 <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center border border-white/10 text-slate-500 mx-auto">
                   <X size={24} />
@@ -564,7 +533,7 @@ const News = () => {
                 }
                 className="overflow-visible"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-0">
                   {news.map((item, index) => {
                     const isSaved = bookmarks.some(b => b.title === item.title);
                     return (
@@ -660,7 +629,7 @@ const News = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-0"
             >
               {VIDEO_BRIEFINGS.map((vid) => (
                 <div 

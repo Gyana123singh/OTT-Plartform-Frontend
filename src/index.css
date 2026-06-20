@@ -61,3 +61,13 @@
 .logo-particle {
   @apply absolute inset-0 bg-accent/20 blur-xl rounded-full opacity-0 transition-all duration-500;
 }
+
+/* Hide scrollbar utility class */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}

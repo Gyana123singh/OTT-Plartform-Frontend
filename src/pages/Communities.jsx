@@ -154,7 +154,7 @@ const Communities = () => {
   return (
     <div className="space-y-8 md:space-y-10 pb-20 text-left relative min-h-[calc(100vh-140px)]">
       {/* Banner / Header */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary/30 via-accent/15 to-dark border border-white/5 p-6 md:p-10 flex flex-col md:flex-row gap-6 justify-between items-center shadow-2xl">
+      <div className="relative rounded-none sm:rounded-3xl overflow-hidden bg-gradient-to-r from-primary/30 via-accent/15 to-dark border-y sm:border border-white/5 p-6 md:p-10 flex flex-col md:flex-row gap-6 justify-between items-center shadow-2xl w-full">
         <div className="space-y-3 z-10 max-w-xl text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-2.5">
             <Users className="text-primary w-6 h-6 animate-pulse" />
@@ -169,7 +169,7 @@ const Communities = () => {
         </div>
         <button 
           onClick={() => setShowCreateModal(true)}
-          className="btn-primary py-3.5 px-8 rounded-xl font-black text-xs uppercase tracking-widest flex items-center gap-2 z-10 hover:shadow-lg shadow-primary/20 shrink-0 cursor-pointer"
+          className="btn-primary py-3.5 px-8 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 z-10 hover:shadow-lg shadow-primary/20 shrink-0 cursor-pointer w-full sm:w-auto"
         >
           <Plus size={16} /> Create Community
         </button>
@@ -179,7 +179,7 @@ const Communities = () => {
       </div>
 
       {/* Search Filter Row */}
-      <div className="max-w-md relative px-1">
+      <div className="max-w-md relative px-4 sm:px-1">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
         <input 
           type="text" 
@@ -199,12 +199,12 @@ const Communities = () => {
         <div className="space-y-10">
           {/* Joined Communities */}
           <section className="space-y-4 md:space-y-6">
-            <h2 className="text-lg md:text-xl font-black text-white flex items-center gap-2 px-1 uppercase tracking-wider">
+            <h2 className="text-lg md:text-xl font-black text-white flex items-center gap-2 px-4 sm:px-1 uppercase tracking-wider">
               <Users size={18} className="text-primary" /> Joined Communities
             </h2>
             
             {filteredJoined.length === 0 ? (
-              <div className="glass-card max-w-md p-8 text-center space-y-4 border border-white/5 rounded-3xl">
+              <div className="glass-card max-w-md mx-4 sm:mx-0 p-8 text-center space-y-4 border border-white/5 rounded-3xl">
                 <Users size={32} className="text-slate-500 mx-auto opacity-40" />
                 <div className="space-y-1">
                   <h4 className="font-bold text-white text-sm uppercase">No Communities Yet</h4>
@@ -212,13 +212,13 @@ const Communities = () => {
                 </div>
                 <button 
                   onClick={() => setShowCreateModal(true)}
-                  className="px-4 py-2 border border-white/10 hover:border-primary/40 rounded-xl text-[10px] font-black uppercase text-slate-300 hover:text-white transition-all bg-white/5 cursor-pointer"
+                  className="px-4 py-2 border border-white/10 hover:border-primary/40 rounded-xl text-[10px] font-black uppercase text-slate-300 hover:text-white transition-all bg-white/5 cursor-pointer w-full sm:w-auto"
                 >
                   Create Community
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-0">
                 {filteredJoined.map((community) => (
                   <div
                     key={community._id}
@@ -277,11 +277,11 @@ const Communities = () => {
           {/* Suggested / Discover Communities */}
           {filteredSuggested.length > 0 && (
             <section className="space-y-4 md:space-y-6 pt-4">
-              <h2 className="text-lg md:text-xl font-black text-white flex items-center gap-2 px-1 uppercase tracking-wider">
+              <h2 className="text-lg md:text-xl font-black text-white flex items-center gap-2 px-4 sm:px-1 uppercase tracking-wider">
                 <Globe size={18} className="text-accent" /> Discover Communities
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-0">
                 {filteredSuggested.map((community) => (
                   <div
                     key={community._id}

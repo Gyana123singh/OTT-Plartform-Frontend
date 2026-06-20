@@ -87,8 +87,8 @@ const Discovery = () => {
   return (
     <div className="space-y-6 md:space-y-10 pb-20 px-0">
       {/* Header & Search */}
-      <div className="flex flex-col gap-4 md:gap-6">
-        <div className="max-w-2xl">
+      <div className="flex flex-col gap-4 md:gap-6 px-0 sm:px-0">
+        <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-2xl md:text-3xl font-black text-white">Discover Content</h1>
           <p className="text-sm md:text-base text-slate-400 mt-1">Explore live streams, videos, and news from across the G Plus network.</p>
         </div>
@@ -109,7 +109,7 @@ const Discovery = () => {
       </div>
 
       {/* Discovery Navigation */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar border-b border-white/5">
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 px-1 sm:px-0 no-scrollbar border-b border-white/5">
         {CATEGORIES.map((cat, i) => (
           <button
             key={i}
@@ -124,7 +124,7 @@ const Discovery = () => {
       </div>
 
       {/* Grid Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 px-1 sm:px-0">
         <div className="flex items-center flex-wrap gap-2 sm:gap-4 text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">
           <span>Showing <span className="text-white">{filteredContent.length}</span> results</span>
           <span className="w-1 h-1 bg-slate-700 rounded-full" />
@@ -139,7 +139,7 @@ const Discovery = () => {
       {/* Content Grid */}
       <motion.div
         layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-1 sm:px-0"
       >
         <AnimatePresence mode='popLayout'>
           {loading ? (
@@ -209,7 +209,7 @@ const Discovery = () => {
       </motion.div>
 
       {/* Featured Creator Section */}
-      <section className="glass-card p-6 md:p-8 border-dashed border-white/20 mt-6 md:mt-0">
+      <section className="glass-card p-6 md:p-8 border-dashed border-white/20 mt-6 md:mt-0 mx-1 sm:mx-0">
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
           <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-tr from-primary to-accent p-1 shrink-0">
             <div className="w-full h-full rounded-full bg-dark flex items-center justify-center overflow-hidden">
@@ -240,7 +240,7 @@ const Discovery = () => {
       </section>
 
       {/* Trending Collections */}
-      <div className="space-y-4 md:space-y-6">
+      <div className="space-y-4 md:space-y-6 px-1 sm:px-0">
         <h3 className="text-lg md:text-xl font-bold flex items-center gap-2">
           <TrendingUp size={24} className="text-accent" /> Trending Collections
         </h3>
